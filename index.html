@@ -1,16 +1,101 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Open Todoist Today</title>
-    <meta http-equiv="refresh" content="0; url=todoist://today">
+
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        margin: 24px;
+        line-height: 1.4;
+      }
+      .small { opacity: 0.75; font-size: 0.95em; }
+      button, a {
+        font: inherit;
+      }
+      button {
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+    </style>
+
     <script>
-      window.location.href = "todoist://today";
-      setTimeout(() => { window.location.href = "todoist://today"; }, 250);
+      (function () {
+        const TODOIST_URI = "todoist://today";
+
+        function tryLaunchTodoist() {
+          // Attempt 1: direct navigation
+          window.location.href = TODOIST_URI;
+
+          // Attempt 2: retry shortly after (some browsers ignore first attempt)
+          setTimeout(() => {
+            window.location.href = TODOIST_URI;
+          }, 250);
+
+          // Attempt 3: "hidden iframe" trick (sometimes helps with protocol handlers)
+          setTimeout(() => {
+            const iframe = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = TODOIST_URI;
+            document.body.appendChild(iframe);
+            setTimeout(() => iframe.remove(), 2000);
+          }, 600);
+        }
+
+        function tryAutoClose() {
+          // Firefox usually blocks closing a tab that wasn't opened by script.
+          // But this is a harmless "best effort" attempt.
+          setTimeout(() => {
+            try {
+              window.open("", "_self");
+              window.close();
+            } catch (e) {
+              // ignore
+            }
+          }, 1200);
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+          // Kick off immediately on load
+          tryLaunchTodoist();
+          tryAutoClose();
+
+          // Wire up manual fallback buttons/links
+          const openBtn = document.getElementById("open");
+          const closeBtn = document.getElementById("close");
+          const link = document.getElementById("link");
+
+          openBtn.addEventListener("click", () => {
+            tryLaunchTodoist();
+            tryAutoClose();
+          });
+
+          closeBtn.addEventListener("click", () => {
+            window.open("", "_self");
+            window.close();
+          });
+
+          link.href = TODOIST_URI;
+        });
+      })();
     </script>
   </head>
+
   <body>
-    <p>Opening Todoist…</p>
-    <p>If nothing happens, <a href="todoist://today">click here</a>.</p>
+    <h1>Opening Todoist (Today)…</h1>
+    <p class="small">
+      If Todoist didn’t open, use the button below. If it did open, you can close this tab.
+    </p>
+
+    <p>
+      <button id="open" type="button">Open Todoist Today</button>
+      <button id="close" type="button">Close tab</button>
+    </p>
+
+    <p class="small">
+      Direct link (fallback): <a id="link" href="#">todoist://today</a>
+    </p>
   </body>
 </html>
