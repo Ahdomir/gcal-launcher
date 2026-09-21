@@ -23,22 +23,22 @@
 
     <script>
       (function () {
-        const TODOIST_URI = "todoist://today";
+        const GCAL_URI = "https://calendar.google.com/calendar/u/0/r";
 
-        function tryLaunchTodoist() {
+        function tryLaunchGcal() {
           // Attempt 1: direct navigation
-          window.location.href = TODOIST_URI;
+          window.location.href = GCAL_URI;
 
           // Attempt 2: retry shortly after (some browsers ignore first attempt)
           setTimeout(() => {
-            window.location.href = TODOIST_URI;
+            window.location.href = GCAL_URI;
           }, 250);
 
           // Attempt 3: "hidden iframe" trick (sometimes helps with protocol handlers)
           setTimeout(() => {
             const iframe = document.createElement("iframe");
             iframe.style.display = "none";
-            iframe.src = TODOIST_URI;
+            iframe.src = GCAL_URI;
             document.body.appendChild(iframe);
             setTimeout(() => iframe.remove(), 2000);
           }, 600);
@@ -68,7 +68,7 @@
           const link = document.getElementById("link");
 
           openBtn.addEventListener("click", () => {
-            tryLaunchTodoist();
+            tryLaunchGcal();
             tryAutoClose();
           });
 
@@ -77,25 +77,25 @@
             window.close();
           });
 
-          link.href = TODOIST_URI;
+          link.href = GCAL_URI;
         });
       })();
     </script>
   </head>
 
   <body>
-    <h1>Opening Todoist (Today)…</h1>
+    <h1>Opening Google Calendar…</h1>
     <p class="small">
-      If Todoist didn’t open, use the button below. If it did open, you can close this tab.
+      If Google Calendar didn’t open, use the button below. If it did open, you can close this tab.
     </p>
 
     <p>
-      <button id="open" type="button">Open Todoist Today</button>
+      <button id="open" type="button">Open Google Calendar</button>
       <button id="close" type="button">Close tab</button>
     </p>
 
     <p class="small">
-      Direct link (fallback): <a id="link" href="#">todoist://today</a>
+      Direct link (fallback): <a id="link" href="#">https://calendar.google.com/calendar/u/0/r</a>
     </p>
   </body>
 </html>
