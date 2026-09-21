@@ -1,1 +1,1 @@
-# todoist-launcher
+# gcal-launcher
